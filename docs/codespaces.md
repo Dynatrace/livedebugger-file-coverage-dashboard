@@ -10,7 +10,7 @@ GitHub Codespaces gives you a fully configured cloud development environment —
 
 Click the badge below to open a new Codespace from the `main` branch:
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/joshDynatrace/livedebugger-file-coverage-dashboard){target="_blank"}
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Dynatrace/livedebugger-file-coverage-dashboard){target="_blank"}
 
 ---
 
