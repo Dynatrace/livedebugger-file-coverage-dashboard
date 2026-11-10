@@ -25,7 +25,18 @@ DT_TENANT_APPS, DT_TENANT_LIVE = build_dt_urls(dt_env_id=DT_ENVIRONMENT_ID, dt_e
 dotenv.set_key(dotenv_path=".env", key_to_set="DT_APPS_URL", value_to_set=DT_TENANT_APPS, export=True)
 dotenv.set_key(dotenv_path=".env", key_to_set="DT_URL", value_to_set=DT_TENANT_LIVE, export=True)
 
-subprocess.run(["kind", "create", "cluster", "--config", ".devcontainer/kind-cluster.yml", "--wait", STANDARD_TIMEOUT])
+# Cluster creation can fail transiently on busy Codespaces VMs (eg. "etcdserver: request timed out"
+# while installing the CNI), so retry a few times, cleaning up between attempts.
+KIND_CREATE_ATTEMPTS = 3
+for attempt in range(1, KIND_CREATE_ATTEMPTS + 1):
+    result = subprocess.run(["kind", "create", "cluster", "--config", ".devcontainer/kind-cluster.yml", "--wait", STANDARD_TIMEOUT])
+    if result.returncode == 0:
+        break
+    print(f"kind cluster creation failed (attempt {attempt}/{KIND_CREATE_ATTEMPTS})")
+    subprocess.run(["kind", "delete", "cluster", "--name", "kind"])
+    if attempt == KIND_CREATE_ATTEMPTS:
+        exit("Could not create the kind cluster. Please rebuild the Codespace or try a larger machine type.")
+    time.sleep(15)
 
 print("Installing Dynatrace OneAgent...")
 install_dynatrace_oneagent(dt_tenant_live=DT_TENANT_LIVE)
